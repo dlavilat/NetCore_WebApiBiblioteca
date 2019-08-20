@@ -28,7 +28,8 @@ namespace WebApiBiblioteca.Controllers
             //Asi que traería, el nombre del autor a parte de la información
             //del libro.
             return context.Libros.Include(x => x.Autor).ToList();
-        }
+            //return context.Libros.ToList();
+        }        
 
         [HttpGet("{id}", Name = "ObtenerLibro")]
         public ActionResult<Libro> Get(int id)
@@ -41,7 +42,7 @@ namespace WebApiBiblioteca.Controllers
             }
 
             return libro;
-        }
+        }        
 
         [HttpPost]
         public ActionResult Post([FromBody] Libro libro)
