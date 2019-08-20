@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiBiblioteca.Contexts;
 using WebApiBiblioteca.Entities;
+using WebApiBiblioteca.Entities.Helpers;
 
 namespace WebApiBiblioteca.Controllers
 {
@@ -27,9 +28,12 @@ namespace WebApiBiblioteca.Controllers
         //Cuando se desea que la acción se acceda de dos formas, basta con repetir [HttGet]
         //y darle una ruta deseada
         [HttpGet("listado")]
+        [HttpGet]
+        [ServiceFilter(typeof(MiFiltroDeAccion))]
         public ActionResult<IEnumerable<Autor>> Get()
         {
             //   return context.Autores.ToList();
+            //throw new NotImplementedException(); //Para revisar que se ejecute el filtro de excepcion 
             claseB.HacerAlgo();
             return context.Autores.Include(x=>x.Libros).ToList();
         }

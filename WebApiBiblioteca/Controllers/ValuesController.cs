@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApiBiblioteca.Controllers
@@ -12,9 +13,12 @@ namespace WebApiBiblioteca.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        [ResponseCache(Duration = 15)] // Esto indica que guarderemos en caché por 15 segundos
+        [Authorize] // De esta manera si el usuario que intenta acceder a la acción no está autenticado
+                    //La página cargará un error 401 que significa sin autorización.
+        public ActionResult<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return DateTime.Now.Second.ToString();
         }
 
         // GET api/values/5

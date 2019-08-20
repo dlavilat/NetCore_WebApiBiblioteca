@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebApiBiblioteca.Contexts;
 using WebApiBiblioteca.Entities;
+using WebApiBiblioteca.Entities.Helpers;
 
 namespace WebApiBiblioteca
 {
@@ -28,10 +30,26 @@ namespace WebApiBiblioteca
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Aqui se está habilitando un conjunto de servicios para la funcionalidad de guardar información
+            //en Caché
+            services.AddResponseCaching();
+
+            //Agregando servicio para el filtro de authorization
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer();
+
+            //Ejemplo de Inyección de dependencias
             services.AddTransient<IClaseB, ClaseB2>();
+
+            //agregando MiFiltroDeAccion
+            services.AddScoped<MiFiltroDeAccion>();
+
             services.AddDbContext<ApplicationDBContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            services.AddMvc(options =>
+                   {
+                       options.Filters.Add(new MiFiltroDeExcepcion());
+                   }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
@@ -49,6 +67,9 @@ namespace WebApiBiblioteca
             }
 
             app.UseHttpsRedirection();
+            //configuración del middleware de cache
+            app.UseResponseCaching();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
